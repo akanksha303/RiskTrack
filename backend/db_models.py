@@ -6,7 +6,7 @@ import datetime
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
     avg_amount = Column(Float, default=1000.0)
     std_dev_amount = Column(Float, default=200.0)
@@ -20,7 +20,7 @@ class User(Base):
 class Transaction(Base):
     __tablename__ = "transactions"
 
-    id = Column(String, primary key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     amount = Column(Float, nullable=False)
     currency = Column(String, default="INR")
@@ -35,7 +35,7 @@ class Transaction(Base):
 class RiskEvaluation(Base):
     __tablename__ = "risk_evaluations"
 
-    id = Column(Integer, primary key=True, index=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     transaction_id = Column(String, ForeignKey("transactions.id"), nullable=False)
     risk_score = Column(Integer, nullable=False)  # 0 to 100
     decision = Column(String, nullable=False)  # APPROVE, REVIEW, BLOCK
