@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TransactionGuard is a real-time financial transaction risk assessment engine and monitoring dashboard. Evaluate fraud signals, velocity limits, geo mismatch, and transaction outliers.">
+    <title>TransactionGuard — Real-time Financial Risk Assessment Engine</title>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Link to premium styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <header class="app-header">
+        <div class="logo-area">
+            <span class="logo-icon">🛡️</span>
+            <div>
+                <h1>TRANSACTIONGUARD</h1>
+                <p class="subtitle">Real-time Financial Risk Intelligence Engine</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div class="connection-status">
+                <span class="status-indicator live" id="status-dot"></span>
+                <span class="status-text" id="status-label">Connecting to Engine...</span>
+            </div>
+            <button id="btn-refresh" class="btn btn-secondary" title="Force Refresh Metrics">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Refresh
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- KPI METRICS GRID -->
+        <section class="kpi-container" aria-label="Key Performance Indicators">
+            <div class="kpi-card" id="kpi-total">
+                <div class="kpi-header">
+                    <span class="kpi-title">Total Evaluated</span>
+                    <span class="kpi-icon">📊</span>
+                </div>
+                <div class="kpi-value" id="val-total">0</div>
+                <div class="kpi-change">System Lifetime Logs</div>
+            </div>
+            
+            <div class="kpi-card review" id="kpi-review">
+                <div class="kpi-header">
+                    <span class="kpi-title">In Review Queue</span>
+                    <span class="kpi-icon">🟡</span>
+                </div>
+                <div class="kpi-value" id="val-review">0</div>
+                <div class="kpi-change">Requires Manual Verification</div>
+            </div>
+
+            <div class="kpi-card blocked" id="kpi-blocked">
+                <div class="kpi-header">
+                    <span class="kpi-title">Blocked Transactions</span>
+                    <span class="kpi-icon">🔴</span>
+                </div>
+                <div class="kpi-value" id="val-blocked">0</div>
+                <div class="kpi-change">High Risk Intercepted</div>
+            </div>
+
+            <div class="kpi-card approved" id="kpi-approved">
+                <div class="kpi-header">
+                    <span class="kpi-title">Auto-Approval Rate</span>
+                    <span class="kpi-icon">🟢</span>
+                </div>
+                <div class="kpi-value" id="val-approval-rate">0%</div>
+                <div class="kpi-change">Low Risk Fast-Tracked</div>
+            </div>
+        </section>
+
+        <!-- SIMULATOR CONTROL & BASELINES (LEFT PANEL) -->
+        <section class="glass-panel panel-left" id="sec-simulation">
+            <h2>🧪 Fraud Simulation Console</h2>
+            <p class="panel-desc">Generate real-time synthetic transactions to test the risk rules and view immediate feedback on the dashboard.</p>
+            
+            <div class="input-group">
+                <label for="select-user">Select Customer Baseline Profile</label>
+                <select id="select-user">
+                    <option value="">-- Random User --</option>
+                </select>
+            </div>
+
+            <div class="simulator-actions">
+                <button class="btn btn-sim btn-standard" id="sim-standard" data-type="standard">
+                    <span class="btn-sim-icon">🟢</span>
+                    <div class="btn-sim-text">
+                        <strong>Standard Transaction</strong>
+                        <span>Legitimate, standard domestic purchase.</span>
+                    </div>
+                </button>
+
+                <button class="btn btn-sim btn-anomaly" id="sim-amount" data-type="amount_anomaly">
+                    <span class="btn-sim-icon">💰</span>
+                    <div class="btn-sim-text">
+                        <strong>Amount Outlier</strong>
+                        <span>Spike exceeding customer average (₹) limit.</span>
+                    </div>
+                </button>
+
+                <button class="btn btn-sim btn-velocity" id="sim-velocity" data-type="velocity_spike">
+                    <span class="btn-sim-icon">⚡</span>
+                    <div class="btn-sim-text">
+                        <strong>Velocity Attack</strong>
+                        <span>Injects 4 rapid purchases in under 10 mins.</span>
+                    </div>
+                </button>
+
+                <button class="btn btn-sim btn-travel" id="sim-travel" data-type="impossible_travel">
+                    <span class="btn-sim-icon">✈️</span>
+                    <div class="btn-sim-text">
+                        <strong>Impossible Travel</strong>
+                        <span>Transactions in different cities within 2 mins.</span>
+                    </div>
+                </button>
+
+                <button class="btn btn-sim btn-hour" id="sim-hour" data-type="unusual_hour">
+                    <span class="btn-sim-icon">🌙</span>
+                    <div class="btn-sim-text">
+                        <strong>Midnight Outlier</strong>
+                        <span>Suspicious midnight txn outside awake hours.</span>
+                    </div>
+                </button>
+            </div>
+
+            <div class="profile-baselines mt-4">
+                <h3>👤 Customer Profiles Overview</h3>
+                <div id="profiles-list" class="profiles-list">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VISUAL CHARTS (CENTER PANEL) -->
+        <section class="glass-panel panel-center" id="sec-charts">
+            <h2>📈 Operational Analytics</h2>
+            
+            <div class="chart-container">
+                <h3>🔍 Risk Score Distribution</h3>
+                <div class="chart-wrapper" id="dist-chart-wrapper">
+                    <!-- SVG Chart injected here -->
+                </div>
+            </div>
+
+            <div class="chart-container mt-4">
+                <h3>🕒 Risk Severity Trends (By Hour)</h3>
+                <div class="chart-wrapper" id="trend-chart-wrapper">
+                    <!-- SVG Chart injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- RECENT EVALUATIONS TABLE (RIGHT PANEL) -->
+        <section class="glass-panel panel-right" id="sec-evaluations">
+            <div class="section-title-bar">
+                <h2>📋 Risk Evaluation Audit Log</h2>
+                <div class="table-legend">
+                    <span class="legend-badge leg-approve">Approve</span>
+                    <span class="legend-badge leg-review">Review</span>
+                    <span class="legend-badge leg-block">Block</span>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="evaluation-table" id="txn-table">
+                    <thead>
+                        <tr>
+                            <th>Txn ID</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Risk Score</th>
+                            <th>Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody id="txn-table-body">
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-8">Fetching evaluation history...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- WHY WAS THIS FLAGGED? DETAIL DRAWER MODAL -->
+    <div class="detail-modal-overlay" id="detail-modal">
+        <div class="detail-modal-container glass-panel">
+            <div class="modal-header">
+                <h2>🔎 Risk Explanation Report</h2>
+                <button id="modal-close" class="btn-close" aria-label="Close report">&times;</button>
+            </div>
+            
+            <div class="modal-body" id="modal-content">
+                <!-- Injected dynamically by app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Script loading -->
+    <script src="app.js"></script>
+</body>
+</html>
